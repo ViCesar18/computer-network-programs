@@ -3,8 +3,8 @@ import errno
 import sys
 from threading import Thread
 
-IP = "127.0.0.1"
-PORT = 1234
+IP = input("IP: ")
+PORT = int(input("Port: "))
 my_username = input("Usuário: ")
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

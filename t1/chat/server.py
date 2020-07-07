@@ -1,8 +1,8 @@
 import socket
 import select   #Ajuda com I/O de dados entre os diferentes sistemas operacionais
 
-IP = "127.0.0.1"
-PORT = 1234
+IP = input("IP: ")
+PORT = int(input("Port: "))
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)       #Cria o socket
 server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)     #Ajusta o socket para permitir reconexão no mesmo (IP, PORT)
