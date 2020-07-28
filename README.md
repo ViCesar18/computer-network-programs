@@ -1,2 +1,2 @@
 # redes
-Desenvolvimento dos trabalhos da disciplina de Redes de Computadores.
+Programas desenvolvidos para a disciplina Redes de Computadores.
