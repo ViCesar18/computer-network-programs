@@ -1,3 +1,7 @@
 #Arquivos recebidos e enviados do t5
 t5-ftp/enviado
 t5-ftp/recebido
+
+#Arquivos recebidos e enviados do t6
+t6-udp/enviado
+t6-udp/recebido
