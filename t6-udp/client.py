@@ -1,8 +1,11 @@
 import socket
 import os
 
-ip = '192.168.0.104'
-port = 8888
+""" ip = '192.168.0.104'
+port = 8888 """
+
+ip = input('IP: ')
+port = input('PORT: ')
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -39,7 +42,6 @@ while tillIC != 0:
     if len(buffer) == buffer_size or tillIC == 0:
         if tillIC == 0:
             buffer_size = len(buffer)
-        
         client_socket.sendto(b'QNTD?', addr)
 
         pacotes_recebidos_pelo_servidor, _ = client_socket.recvfrom(package_size)
@@ -48,7 +50,7 @@ while tillIC != 0:
         i = package_number - buffer_size
         
         while pacotes_recebidos_pelo_servidor != buffer_size:
-            client_socket.sendto(b'RES!', addr)
+            client_socket.sendto(b'RESET!', addr)
             for data in buffer:
                 print(f'Reenviando pacote numero: {i}')
                 client_socket.sendto(data, addr)
@@ -60,7 +62,8 @@ while tillIC != 0:
 
         buffer = []
         client_socket.sendto(b'OK!', addr)
-        print('porra')
+
+#client_socket.sendto(b'END!', addr)
     
 f.close()
 client_socket.close()

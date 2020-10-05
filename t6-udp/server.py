@@ -21,11 +21,11 @@ Count, countadress = server_socket.recvfrom(package_size)
 tillI = Count.decode()
 tillI = int(tillI)
 
-while True:
+loop = True
+while loop:
     package, addr = server_socket.recvfrom(package_size)
 
     if package == b'OK!':
-        print('porra')
         for data in buffer:
             f.write(data)
 
@@ -33,8 +33,10 @@ while True:
     elif package == b'QNTD?':
         server_socket.sendto(str(i).encode(), addr)
         i = 0
-    elif package == b'RES!':
+    elif package == b'RESET!':
         buffer = []
+    elif package == b'END!':
+        loop = False
     else:
         buffer.append(package)
         
