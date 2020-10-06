@@ -33,7 +33,6 @@ while loop:
         for data in buffer:
             f.write(data)
         buffer = []
-        server_socket.sendto(b'RCVED!', client_addr)
 
     elif package == b'QNTD?':
         server_socket.sendto(str(len(buffer)).encode(), client_addr)

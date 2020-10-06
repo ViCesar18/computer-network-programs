@@ -2,11 +2,11 @@ import socket
 import os
 import time
 
-ip = '192.168.0.104'
+ip = '201.21.146.35'
 port = 8888
 
-""" ip = input('IP: ')
-port = int(input('PORT: ')) """
+ip = input('IP: ')
+port = int(input('PORT: '))
 file_name = input('Nome do Arquivo: ')
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -51,6 +51,7 @@ while tillIC != 0:
             buffer_size = len(buffer)
         
         client_socket.sendto(b'QNTD?', addr)
+
         pacotes_recebidos_pelo_servidor, _ = client_socket.recvfrom(package_size)
         pacotes_recebidos_pelo_servidor = int(pacotes_recebidos_pelo_servidor.decode('utf-8'))
 
@@ -65,6 +66,7 @@ while tillIC != 0:
                 i += 1
             
             client_socket.sendto(b'QNTD?', addr)
+            
             pacotes_recebidos_pelo_servidor, _ = client_socket.recvfrom(package_size)
             pacotes_recebidos_pelo_servidor = int(pacotes_recebidos_pelo_servidor.decode('utf-8'))
 
@@ -73,10 +75,6 @@ while tillIC != 0:
         buffer = []
 
         client_socket.sendto(b'OK!', addr)
-
-        teste, _ = client_socket.recvfrom(package_size)
-        while teste != b'RCVED!': 
-            teste, _ = client_socket.recvfrom(package_size)
 
 client_socket.sendto(b'END!', addr)
     
