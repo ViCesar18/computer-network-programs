@@ -5,3 +5,9 @@ t5-ftp/recebido
 #Arquivos recebidos e enviados do t6
 t6-udp/enviado
 t6-udp/recebido
+
+#Arquivos
+*.jpg
+*.png
+*.zip
+*.rar

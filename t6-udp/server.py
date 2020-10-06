@@ -13,7 +13,10 @@ buffer_size = 8
 buffer = []
 i = 0
 
-f = open('./recebido/uel.jpg', 'wb')
+file_name, client_addr = server_socket.recvfrom(package_size)
+server_socket.sendto(b'RECEIVED!', client_addr)
+
+f = open(f'./recebido/{file_name.decode()}', 'wb')
 
 package_number = 0
 
@@ -25,20 +28,23 @@ tillI = int(tillI)
 loop = True
 transmission_start = time.time()
 while loop:
-    package, addr = server_socket.recvfrom(package_size)
+    package, client_addr = server_socket.recvfrom(package_size)
 
     if package == b'OK!':
+        server_socket.sendto(b'RECEIVED!', client_addr)
         for data in buffer:
             f.write(data)
 
         buffer = []
     elif package == b'QNTD?':
-        server_socket.sendto(str(len(buffer)).encode(), addr)
+        server_socket.sendto(str(len(buffer)).encode(), client_addr)
 
     elif package == b'RESET!':
+        server_socket.sendto(b'RECEIVED!', client_addr)
         buffer = []
 
     elif package == b'END!':
+        server_socket.sendto(b'RECEIVED!', client_addr)
         loop = False
 
     else:

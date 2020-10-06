@@ -7,17 +7,23 @@ port = 8888 """
 
 ip = input('IP: ')
 port = int(input('PORT: '))
+file_name = input('Nome do Arquivo: ')
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-BUFFER_SIZE = 2
+BUFFER_SIZE = 8
 
-package_size = 100
+package_size = 1024
 buffer = []
 buffer_size = BUFFER_SIZE
 addr = (ip, port)
 
-size = os.stat('./enviado/teste.zip')
+recebido = b''
+while recebido != b'RECEIVED!':
+    client_socket.sendto(file_name.encode(), addr)  #Enviando o nome do arquivo
+    recebido, _ = client_socket.recvfrom(package_size)
+
+size = os.stat(file_name)
 sizeS = size.st_size   #número de pacotes
 Num = int(sizeS / package_size)
 Num = Num + 1
@@ -29,7 +35,7 @@ client_socket.sendto(tillC, addr)
 
 tillIC = int(Num)
 
-f = open('./enviado/teste.zip', 'rb')
+f = open(file_name, 'rb')
 
 package_number = 0
 
@@ -46,28 +52,45 @@ while tillIC != 0:
     if len(buffer) == buffer_size or tillIC == 0:
         if tillIC == 0:
             buffer_size = len(buffer)
-        client_socket.sendto(b'QNTD?', addr)
+        
+        pacotes_recebidos_pelo_servidor = None
+        while type(pacotes_recebidos_pelo_servidor) != int:
+            client_socket.sendto(b'QNTD?', addr)
+            pacotes_recebidos_pelo_servidor, _ = client_socket.recvfrom(package_size)
+            pacotes_recebidos_pelo_servidor = int(pacotes_recebidos_pelo_servidor.decode('utf-8'))
 
-        pacotes_recebidos_pelo_servidor, _ = client_socket.recvfrom(package_size)
-
-        pacotes_recebidos_pelo_servidor = int(pacotes_recebidos_pelo_servidor.decode('utf-8'))
-        i = package_number - buffer_size
+        i = package_number - buffer_size + 1
         
         while pacotes_recebidos_pelo_servidor != buffer_size:
-            client_socket.sendto(b'RESET!', addr)
+            recebido = b''
+            while recebido != b'RECEIVED!':
+                client_socket.sendto(b'RESET!', addr)
+                recebido, _ = client_socket.recvfrom(package_size)
+
             for data in buffer:
                 print(f'Reenviando pacote numero: {i}')
                 client_socket.sendto(data, addr)
                 i += 1
             
-            client_socket.sendto(b'QNTD?', addr)
-            pacotes_recebidos_pelo_servidor = client_socket.recvfrom(package_size)
-            i = package_number - buffer_size
+            pacotes_recebidos_pelo_servidor = None
+            while type(pacotes_recebidos_pelo_servidor) != int:
+                client_socket.sendto(b'QNTD?', addr)
+                pacotes_recebidos_pelo_servidor, _ = client_socket.recvfrom(package_size)
+                pacotes_recebidos_pelo_servidor = int(pacotes_recebidos_pelo_servidor.decode('utf-8'))
+
+            i = package_number - buffer_size + 1
 
         buffer = []
-        client_socket.sendto(b'OK!', addr)
 
-client_socket.sendto(b'END!', addr)
+        recebido = b''
+        while recebido != b'RECEIVED!':
+            client_socket.sendto(b'OK!', addr)
+            recebido, _ = client_socket.recvfrom(package_size)
+
+recebido = b''
+while recebido != b'RECEIVED!':
+    client_socket.sendto(b'END!', addr)
+    recebido, _ = client_socket.recvfrom(package_size)
     
 f.close()
 client_socket.close()
