@@ -10,14 +10,14 @@ port = int(input('PORT: '))
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-BUFFER_SIZE = 8
+BUFFER_SIZE = 2
 
-package_size = 1024
+package_size = 100
 buffer = []
 buffer_size = BUFFER_SIZE
 addr = (ip, port)
 
-size = os.stat('./enviado/uel.jpg')
+size = os.stat('./enviado/teste.zip')
 sizeS = size.st_size   #número de pacotes
 Num = int(sizeS / package_size)
 Num = Num + 1
@@ -29,7 +29,7 @@ client_socket.sendto(tillC, addr)
 
 tillIC = int(Num)
 
-f = open('./enviado/uel.jpg', 'rb')
+f = open('./enviado/teste.zip', 'rb')
 
 package_number = 0
 

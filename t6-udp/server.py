@@ -33,16 +33,17 @@ while loop:
 
         buffer = []
     elif package == b'QNTD?':
-        server_socket.sendto(str(i).encode(), addr)
-        i = 0
+        server_socket.sendto(str(len(buffer)).encode(), addr)
+
     elif package == b'RESET!':
         buffer = []
+
     elif package == b'END!':
         loop = False
+
     else:
         buffer.append(package)
         
-        i += 1
         package_number += 1
         tillI -= 1  
         print(f"Recebendo pacote numero: {package_number}")
