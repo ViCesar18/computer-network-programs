@@ -14,7 +14,6 @@ buffer = []
 i = 0
 
 file_name, client_addr = server_socket.recvfrom(package_size)
-server_socket.sendto(b'RECEIVED!', client_addr)
 
 f = open(f'./recebido/{file_name.decode()}', 'wb')
 
@@ -31,20 +30,18 @@ while loop:
     package, client_addr = server_socket.recvfrom(package_size)
 
     if package == b'OK!':
-        server_socket.sendto(b'RECEIVED!', client_addr)
         for data in buffer:
             f.write(data)
-
         buffer = []
+        server_socket.sendto(b'RCVED!', client_addr)
+
     elif package == b'QNTD?':
         server_socket.sendto(str(len(buffer)).encode(), client_addr)
 
     elif package == b'RESET!':
-        server_socket.sendto(b'RECEIVED!', client_addr)
         buffer = []
 
     elif package == b'END!':
-        server_socket.sendto(b'RECEIVED!', client_addr)
         loop = False
 
     else:

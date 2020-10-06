@@ -2,11 +2,11 @@ import socket
 import os
 import time
 
-""" ip = '192.168.0.104'
-port = 8888 """
+ip = '192.168.0.104'
+port = 8888
 
-ip = input('IP: ')
-port = int(input('PORT: '))
+""" ip = input('IP: ')
+port = int(input('PORT: ')) """
 file_name = input('Nome do Arquivo: ')
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -18,10 +18,7 @@ buffer = []
 buffer_size = BUFFER_SIZE
 addr = (ip, port)
 
-recebido = b''
-while recebido != b'RECEIVED!':
-    client_socket.sendto(file_name.encode(), addr)  #Enviando o nome do arquivo
-    recebido, _ = client_socket.recvfrom(package_size)
+client_socket.sendto(file_name.encode(), addr)  #Envia o nome do arquivo
 
 size = os.stat(file_name)
 sizeS = size.st_size   #número de pacotes
@@ -53,44 +50,35 @@ while tillIC != 0:
         if tillIC == 0:
             buffer_size = len(buffer)
         
-        pacotes_recebidos_pelo_servidor = None
-        while type(pacotes_recebidos_pelo_servidor) != int:
-            client_socket.sendto(b'QNTD?', addr)
-            pacotes_recebidos_pelo_servidor, _ = client_socket.recvfrom(package_size)
-            pacotes_recebidos_pelo_servidor = int(pacotes_recebidos_pelo_servidor.decode('utf-8'))
+        client_socket.sendto(b'QNTD?', addr)
+        pacotes_recebidos_pelo_servidor, _ = client_socket.recvfrom(package_size)
+        pacotes_recebidos_pelo_servidor = int(pacotes_recebidos_pelo_servidor.decode('utf-8'))
 
         i = package_number - buffer_size + 1
         
         while pacotes_recebidos_pelo_servidor != buffer_size:
-            recebido = b''
-            while recebido != b'RECEIVED!':
-                client_socket.sendto(b'RESET!', addr)
-                recebido, _ = client_socket.recvfrom(package_size)
+            client_socket.sendto(b'RESET!', addr)
 
             for data in buffer:
                 print(f'Reenviando pacote numero: {i}')
                 client_socket.sendto(data, addr)
                 i += 1
             
-            pacotes_recebidos_pelo_servidor = None
-            while type(pacotes_recebidos_pelo_servidor) != int:
-                client_socket.sendto(b'QNTD?', addr)
-                pacotes_recebidos_pelo_servidor, _ = client_socket.recvfrom(package_size)
-                pacotes_recebidos_pelo_servidor = int(pacotes_recebidos_pelo_servidor.decode('utf-8'))
+            client_socket.sendto(b'QNTD?', addr)
+            pacotes_recebidos_pelo_servidor, _ = client_socket.recvfrom(package_size)
+            pacotes_recebidos_pelo_servidor = int(pacotes_recebidos_pelo_servidor.decode('utf-8'))
 
             i = package_number - buffer_size + 1
 
         buffer = []
 
-        recebido = b''
-        while recebido != b'RECEIVED!':
-            client_socket.sendto(b'OK!', addr)
-            recebido, _ = client_socket.recvfrom(package_size)
+        client_socket.sendto(b'OK!', addr)
 
-recebido = b''
-while recebido != b'RECEIVED!':
-    client_socket.sendto(b'END!', addr)
-    recebido, _ = client_socket.recvfrom(package_size)
+        teste, _ = client_socket.recvfrom(package_size)
+        while teste != b'RCVED!': 
+            teste, _ = client_socket.recvfrom(package_size)
+
+client_socket.sendto(b'END!', addr)
     
 f.close()
 client_socket.close()
