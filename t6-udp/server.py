@@ -1,4 +1,5 @@
 import socket
+import time
 
 ip = '0.0.0.0'
 port = 8888
@@ -22,6 +23,7 @@ tillI = Count.decode()
 tillI = int(tillI)
 
 loop = True
+transmission_start = time.time()
 while loop:
     package, addr = server_socket.recvfrom(package_size)
 
@@ -47,3 +49,13 @@ while loop:
 
 f.close()
 server_socket.close()
+
+transmission_end = time.time()
+transmission_time = transmission_end - transmission_start
+
+print('\nArquivo enviado com sucesso!')
+print(f'Tamanho do arquivo: {package_number * package_size} Bytes')
+print(f'Número de Pacotes transmitidos: {package_number}')
+print(f'Tamanho dos Pacotes: {package_size}')
+print(f'Tamanho do Buffer: {buffer_size}')
+print(f'Velocidade de Transmissão: {round((package_number * package_size * 8) / 1024 / transmission_time, 2)} kb/s') #Multiplicado por 8 para converter Bytes para Bits
