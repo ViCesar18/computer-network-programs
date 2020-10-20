@@ -36,9 +36,18 @@ transmission_start = time.time()
 while tillIC != 0:
     package = f.read(package_size)
     client_socket.sendto(package, addr)
-    print(f"Pacote numero {package_number} enviado!")
 
-    while client_socket.recvfrom(package_size) != b'RECEBIDO!':
+    package_number += 1
+    tillIC -= 1
+
+    print(f"Pacote numero {package_number} enviado!")
+    
+    while True:
+        server_package, server_addr = client_socket.recvfrom(package_size)
+
+        if(server_package == b'RECEIVED!'):
+            break
+
         client_socket.sendto(package, addr)
         print(f"Pacote numero {package_number} reenviado!")
 

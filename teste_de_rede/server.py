@@ -32,7 +32,7 @@ while loop:
     else:
         f.write(package)
 
-        server_socket.sendto('RECEBIDO!', client_addr)
+        server_socket.sendto(b'RECEIVED!', client_addr)
 
         package_number += 1
         tillI -= 1  
