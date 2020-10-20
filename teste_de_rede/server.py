@@ -11,7 +11,7 @@ addr = (ip, port)
 package_size = 1024
 i = 0
 lista = []
-size_lista = 4
+size_lista = 8
 
 file_name, client_addr = server_socket.recvfrom(package_size)
 
@@ -29,21 +29,19 @@ transmission_start = time.time()
 while loop:
     package, client_addr = server_socket.recvfrom(package_size)
 
-    if package == b'END!':
-        loop = False
-
-    elif package == b'AMOUNT?':
-        amount = len(lista)
-        server_socket.sendto(str(amount).encode(), client_addr)
-
-    elif package == b'OK!':
-        for p in lista:
-            f.write(p)
+    if package == b'OK!':
+        for data in lista:
+            f.write(data)
         lista = []
-    
+
+    elif package == b'QNTD?':
+        server_socket.sendto(str(len(lista)).encode(), client_addr)
+
     elif package == b'RESET!':
         lista = []
-        package_number = package_number - size_lista
+
+    elif package == b'END!':
+        loop = False
 
     else:
         lista.append(package)

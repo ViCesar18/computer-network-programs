@@ -37,13 +37,13 @@ package_number = 0
 transmission_start = time.time()
 while tillIC != 0:
     package = f.read(package_size)
-    lista.append(package)
     client_socket.sendto(package, addr)
+    lista.append(package)
 
     package_number += 1
     tillIC -= 1
 
-    print(f'Pacote numero {package_number} enviando!')
+    print(f'Pacote numero {package_number} enviado!')
 
     if len(lista) == size_lista or tillIC == 0:
         if tillIC == 0:
@@ -62,7 +62,7 @@ while tillIC != 0:
             for data in lista:
                 client_socket.sendto(data, addr)
                 i += 1
-                print(f'Pacote numero {i} reenviando!')
+                print(f'Pacote numero {i} reenviado!')
             
             client_socket.sendto(b'AMOUNT?', addr)
             
