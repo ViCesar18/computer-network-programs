@@ -33,12 +33,14 @@ while loop:
         for data in lista:
             f.write(data)
         lista = []
+        server_socket.sendto(b'WRITED!', client_addr)
 
     elif package == b'AMOUNT?':
         server_socket.sendto(str(len(lista)).encode(), client_addr)
 
     elif package == b'RESET!':
         lista = []
+        server_socket.sendto(b'RESETED!', client_addr)
 
     elif package == b'END!':
         loop = False

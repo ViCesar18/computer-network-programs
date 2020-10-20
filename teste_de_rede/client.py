@@ -22,7 +22,7 @@ Num = int(sizeS / package_size)
 Num = Num + 1
 print(f"Número de Pacotes para ser enviado: {str(Num)}")
 lista = []
-size_lista = 4
+size_lista = 8
 
 till = str(Num)
 tillC = till.encode()
@@ -37,8 +37,8 @@ package_number = 0
 transmission_start = time.time()
 while tillIC != 0:
     package = f.read(package_size)
-    client_socket.sendto(package, addr)
     lista.append(package)
+    client_socket.sendto(package, addr)
 
     package_number += 1
     tillIC -= 1
@@ -58,6 +58,10 @@ while tillIC != 0:
         
         while pacotes_recebidos_pelo_servidor != size_lista:
             client_socket.sendto(b'RESET!', addr)
+            received, _ = client_socket.recvfrom(package_size)
+            if received != b'RESETED!':
+                print('Servidor nao conseguiu resetar a lista do buffer!')
+                exit()
 
             for data in lista:
                 client_socket.sendto(data, addr)
@@ -74,6 +78,10 @@ while tillIC != 0:
         lista = []
 
         client_socket.sendto(b'OK!', addr)
+        writed, _ = client_socket.recvfrom(package_size)
+        if writed != b'WRITED!':
+            print('Servidor nao conseguiu escrever os pacotes no arquivo!')
+            exit()
 
 client_socket.sendto(b'END!', addr)
     
