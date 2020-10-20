@@ -44,6 +44,11 @@ while tillIC != 0:
     tillIC -= 1
 
     print(f'Pacote numero {package_number} enviado!')
+    received, _ = client_socket.recvfrom(package_size)
+    if received != b'RECEIVED!':
+        print('Servidor nao conseguiu receber o pacote!')
+        exit()
+
 
     if len(lista) == size_lista or tillIC == 0:
         if tillIC == 0:

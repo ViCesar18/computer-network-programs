@@ -51,6 +51,7 @@ while loop:
         package_number += 1
         tillI -= 1  
         print(f"Pacote numero {package_number} recebido!")
+        server_socket.sendto(b'RECEIVED!', client_addr)
 
 f.close()
 server_socket.close()
