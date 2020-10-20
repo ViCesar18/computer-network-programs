@@ -10,6 +10,8 @@ server_socket.bind((ip, port))
 addr = (ip, port)
 package_size = 1024
 i = 0
+lista = []
+size_lista = 4
 
 file_name, client_addr = server_socket.recvfrom(package_size)
 
@@ -29,10 +31,22 @@ while loop:
 
     if package == b'END!':
         loop = False
-    else:
-        f.write(package)
 
-        server_socket.sendto(b'RECEIVED!', client_addr)
+    elif package == b'AMOUNT?':
+        amount = len(lista)
+        server_socket.sendto(str(amount).encode(), client_addr)
+
+    elif package == b'OK!':
+        for p in lista:
+            f.write(p)
+        lista = []
+    
+    elif package == b'RESET!':
+        lista = []
+        package_number = package_number - size_lista
+
+    else:
+        lista.append(package)
 
         package_number += 1
         tillI -= 1  

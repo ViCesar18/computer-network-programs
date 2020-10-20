@@ -21,6 +21,8 @@ sizeS = size.st_size   #número de pacotes
 Num = int(sizeS / package_size)
 Num = Num + 1
 print(f"Número de Pacotes para ser enviado: {str(Num)}")
+lista = []
+size_lista = 4
 
 till = str(Num)
 tillC = till.encode()
@@ -35,21 +37,43 @@ package_number = 0
 transmission_start = time.time()
 while tillIC != 0:
     package = f.read(package_size)
+    lista.append(package)
     client_socket.sendto(package, addr)
 
     package_number += 1
     tillIC -= 1
 
-    print(f"Pacote numero {package_number} enviado!")
-    
-    while True:
-        server_package, server_addr = client_socket.recvfrom(package_size)
+    print(f'Pacote numero {package_number} enviando!')
 
-        if(server_package == b'RECEIVED!'):
-            break
+    if len(lista) == size_lista or tillIC == 0:
+        if tillIC == 0:
+            size_lista = len(lista)
+        
+        client_socket.sendto(b'AMOUNT?', addr)
 
-        client_socket.sendto(package, addr)
-        print(f"Pacote numero {package_number} reenviado!")
+        pacotes_recebidos_pelo_servidor, _ = client_socket.recvfrom(package_size)
+        pacotes_recebidos_pelo_servidor = int(pacotes_recebidos_pelo_servidor.decode())
+
+        i = package_number - size_lista + 1
+        
+        while pacotes_recebidos_pelo_servidor != size_lista:
+            client_socket.sendto(b'RESET!', addr)
+
+            for data in lista:
+                client_socket.sendto(data, addr)
+                i += 1
+                print(f'Pacote numero {i} reenviando!')
+            
+            client_socket.sendto(b'AMOUNT?', addr)
+            
+            pacotes_recebidos_pelo_servidor, _ = client_socket.recvfrom(package_size)
+            pacotes_recebidos_pelo_servidor = int(pacotes_recebidos_pelo_servidor.decode())
+
+            i = package_number - size_lista + 1
+
+        lista = []
+
+        client_socket.sendto(b'OK!', addr)
 
 client_socket.sendto(b'END!', addr)
     
