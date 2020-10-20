@@ -34,7 +34,7 @@ while loop:
             f.write(data)
         lista = []
 
-    elif package == b'QNTD?':
+    elif package == b'AMOUNT?':
         server_socket.sendto(str(len(lista)).encode(), client_addr)
 
     elif package == b'RESET!':
