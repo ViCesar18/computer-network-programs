@@ -3,7 +3,7 @@ import socket
 
 ## DOWNLOAD DO SERVIDOR
 
-HOST = '127.0.0.1'
+HOST = input('Digite o IP que deseja conectar: ')
 PORT = 8888
 BUFFER = 4096
 
@@ -24,7 +24,7 @@ while True:
     endtime = datetime.datetime.now()
     delta = endtime - starttime
 
-    if(delta.seconds >= 5):
+    if(delta.seconds >= 20):
         break
 
 sock.close()
@@ -36,31 +36,27 @@ print(f'Desconectado de {HOST}:{PORT}\n')
 ## UPLOAD DO SERVIDOR
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.bind((HOST,PORT))
-sock.listen(0)
-print(f'Escutando em {HOST}:{PORT}\n')
-
-client_sock, client_addr = sock.accept()
+sock.connect((HOST,PORT))
 
 starttime = datetime.datetime.now()
 print(starttime, end=' ')
-print(f'{client_addr[0]}:{client_addr[1]} conectado\n')
+print(f'Conectado à {HOST}:{PORT}\n')
 
 count = 0
 
 print("### Testando Upload do Servidor ###")
 while True:
-    data = client_sock.recv(BUFFER)
+    data = sock.recv(BUFFER)
     if data:
         count += len(data)
         del data
         continue
 
-    client_sock.close()
+    sock.close()
 
     endtime = datetime.datetime.now()
     print(endtime, end=' ')
-    print(f'{client_addr[0]}:{client_addr[1]} desconectado\n')
+    print(f'Desconectado de {HOST}:{PORT}\n')
 
     break
 
