@@ -77,7 +77,6 @@ while True:
         print('.', end='', flush=True)
 
     if(delta.seconds >= 20):
-        sock.close()
         break
 
 print('\n')

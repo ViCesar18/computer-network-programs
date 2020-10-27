@@ -48,12 +48,9 @@ starttime = datetime.datetime.now()
 print(starttime, end=' ')
 print(f'{client_addr[0]}:{client_addr[1]} conectado')
 
-count = 0
-
 while True:
     data = client_sock.recv(BUFFER)
     if data:
-        count += len(data)
         del data
         continue
 
