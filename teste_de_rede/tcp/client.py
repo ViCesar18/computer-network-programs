@@ -1,37 +1,53 @@
 import datetime
 import socket
 
-## DOWNLOAD DO SERVIDOR
+## DOWNLOAD
 
 HOST = input('Digite o IP que deseja conectar: ')
 PORT = 8888
 BUFFER = 4096
 
-testdata = b'x' * BUFFER * 4
-
-print("\n### Testando Download do Servidor ###")
-
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.connect((HOST,PORT))
 
 starttime = datetime.datetime.now()
-print(starttime, end=' ')
-print(f'Conectado à {HOST}:{PORT}\n')
+""" print(starttime, end=' ')
+print(f'Conectado à {HOST}:{PORT}\n') """
 
+count = 0
+print_count = 1
+
+print('\n### Testando Download ###')
 while True:
-    sock.send(testdata)
+    data = sock.recv(BUFFER)
 
     endtime = datetime.datetime.now()
     delta = endtime - starttime
 
-    if(delta.seconds >= 20):
-        break
+    if data:
+        count += len(data)
+        del data
 
-sock.close()
+        if(delta.seconds >= print_count):
+            print_count = print_count + 1
+            print('.', end='', flush=True)
 
-endtime = datetime.datetime.now()
-print(endtime, end=' ')
-print(f'Desconectado de {HOST}:{PORT}\n')
+        continue
+    
+    print('\n')
+    sock.close()
+
+    endtime = datetime.datetime.now()
+    """ print(endtime, end=' ')
+    print(f'Desconectado de {HOST}:{PORT}\n') """
+
+    print('## RESULTADO ##')
+    print(f'Bytes Transferidos: {count / 1024 / 1024} MB')
+    delta = endtime - starttime
+    print(f'Tempo (segundos): {delta.seconds}')
+    speed = (count * 8) / 1024 / 1024 / delta.seconds
+    print(f'Velocidade Média (Mbps): {speed}\n')
+    break
 
 ## UPLOAD DO SERVIDOR
 
@@ -39,25 +55,41 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.connect((HOST,PORT))
 
 starttime = datetime.datetime.now()
-print(starttime, end=' ')
-print(f'Conectado à {HOST}:{PORT}\n')
+""" print(starttime, end=' ')
+print(f'Conectado à {HOST}:{PORT}\n') """
 
 count = 0
+print_count = 1
 
-print("### Testando Upload do Servidor ###")
+print('### Testando Upload ###')
+
+testdata = b'x' * BUFFER * 4
+
 while True:
-    data = sock.recv(BUFFER)
-    if data:
-        count += len(data)
-        del data
-        continue
-
-    sock.close()
+    sock.send(testdata)
+    count += len(testdata)
 
     endtime = datetime.datetime.now()
-    print(endtime, end=' ')
-    print(f'Desconectado de {HOST}:{PORT}\n')
+    delta = endtime - starttime
 
-    break
+    if(delta.seconds >= print_count):
+        print_count = print_count + 1
+        print('.', end='', flush=True)
 
+    if(delta.seconds >= 20):
+        sock.close()
+        break
+
+print('\n')
 sock.close()
+
+endtime = datetime.datetime.now()
+""" print(endtime, end=' ')
+print(f'Desconectado de {HOST}:{PORT}\n') """
+
+print('## RESULTADO ##')
+print(f'Bytes Transferidos: {count / 1024 / 1024} MB')
+delta = endtime - starttime
+print(f'Tempo (segundos): {delta.seconds}')
+speed = (count * 8) / 1024 / 1024 / delta.seconds
+print(f'Velocidade Média (Mbps): {speed}\n')
