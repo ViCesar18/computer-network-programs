@@ -5,26 +5,29 @@ import socket
 
 HOST = input('Digite o IP que deseja conectar: ')
 PORT = 8888
-BUFFER = 4096
+PACKAGE_SIZE = 4096
+ADDR = (HOST, PORT)
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.connect((HOST,PORT))
+HEADER_SIZE = 16
+PAYLOAD_SIZE = PACKAGE_SIZE - HEADER_SIZE
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+sock.sendto(b'OK!', ADDR)
 
 starttime = datetime.datetime.now()
-""" print(starttime, end=' ')
-print(f'Conectado à {HOST}:{PORT}\n') """
 
 count = 0
 print_count = 1
 
 print('\n### Testando Download ###')
 while True:
-    data = sock.recv(BUFFER)
+    data, server_socket = sock.recvfrom(PACKAGE_SIZE)
 
     endtime = datetime.datetime.now()
     delta = endtime - starttime
 
-    if data:
+    if data != b'END!':
         count += len(data)
         del data
 
@@ -35,39 +38,35 @@ while True:
         continue
     
     print('\n')
-    sock.close()
 
     endtime = datetime.datetime.now()
-    """ print(endtime, end=' ')
-    print(f'Desconectado de {HOST}:{PORT}\n') """
 
     print('## RESULTADO ##')
-    print(f'Bytes Transferidos: {count / 1024 / 1024} MB')
+    print(f'Bytes Transferidos: {round(count / 1024 / 1024, 2)} MB')
     delta = endtime - starttime
     print(f'Tempo (segundos): {delta.seconds}')
-    speed = (count * 8) / 1024 / 1024 / delta.seconds
+    speed = int((count * 8) / 1024 / 1024 / delta.seconds)
     print(f'Velocidade Média (Mbps): {speed}\n')
     break
 
 ## UPLOAD DO SERVIDOR
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.connect((HOST,PORT))
-
 starttime = datetime.datetime.now()
-""" print(starttime, end=' ')
-print(f'Conectado à {HOST}:{PORT}\n') """
 
 count = 0
 print_count = 1
 
 print('### Testando Upload ###')
 
-testdata = b'x' * BUFFER * 4
+payload = b'x' * PAYLOAD_SIZE
+header_count = 1
 
 while True:
-    sock.send(testdata)
-    count += len(testdata)
+    header = bytes('{:0>16}'.format(format(header_count, 'X')), 'utf-8')      #Faz um header com caracteres com o contador de pacotes em hexadecimal
+    header_count += 1
+    package = b''.join([header, payload])
+    sock.sendto(package, ADDR)
+    count += len(package)
 
     endtime = datetime.datetime.now()
     delta = endtime - starttime
@@ -77,18 +76,22 @@ while True:
         print('.', end='', flush=True)
 
     if(delta.seconds >= 20):
+        sock.sendto(b'END!', ADDR)
         break
 
 print('\n')
-sock.close()
 
 endtime = datetime.datetime.now()
-""" print(endtime, end=' ')
-print(f'Desconectado de {HOST}:{PORT}\n') """
+
+data, server_addr = sock.recvfrom(PACKAGE_SIZE)
+package_lost = data.decode()
+
+sock.close()
 
 print('## RESULTADO ##')
-print(f'Bytes Transferidos: {count / 1024 / 1024} MB')
+print(f'Bytes Transferidos: {round(count / 1024 / 1024, 2)} MB')
+print(f'Pacotes Perdidos: {package_lost}')
 delta = endtime - starttime
 print(f'Tempo (segundos): {delta.seconds}')
-speed = (count * 8) / 1024 / 1024 / delta.seconds
+speed = int((count * 8) / 1024 / 1024 / delta.seconds)
 print(f'Velocidade Média (Mbps): {speed}\n')
