@@ -50,13 +50,13 @@ while True:
     
     window_package_counter = index - TRANSMISSION_WINDOW + 1
     
-    while window_package_counter < index + 1:
+    while True:
         f.write(package_list[window_package_counter])
         window_package_counter = window_package_counter + 1
 
-        """ if(window_package_counter == index + 1):
-            #package_list.clear()
-            break """
+        if(window_package_counter == index + 1):
+            package_list.clear()
+            break
     
     server_socket.sendto(b'RECEIVED!', client_addr)
 
