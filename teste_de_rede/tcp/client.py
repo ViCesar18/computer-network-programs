@@ -49,7 +49,7 @@ while True:
     print(f'Velocidade Média (Mbps): {speed}\n')
     break
 
-## UPLOAD DO SERVIDOR
+## UPLOAD
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.connect((HOST,PORT))

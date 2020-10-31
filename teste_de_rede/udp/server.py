@@ -7,10 +7,8 @@ HOST = '0.0.0.0'
 PORT = 8888
 PACKAGE_SIZE = 4096
 
-HEADER_SIZE = 16
+HEADER_SIZE = 8
 PAYLOAD_SIZE = PACKAGE_SIZE - HEADER_SIZE
-
-testdata = b'x' * PAYLOAD_SIZE
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((HOST,PORT))
@@ -20,26 +18,56 @@ print(f'\nVinculado em {HOST}:{PORT}\n')
 print("### Testando Download do Cliente ###\n")
 
 data, client_addr = sock.recvfrom(PACKAGE_SIZE)
-if data != b'OK!':
-    print('Nao se conectou com o cliente!')
+if data == b'CONNECT!':
+    sock.sendto(b'CONNECTED', client_addr)
+else:
+    print('Server nao se conectou com o cliente!')
     exit(1)
 
+
+sock.settimeout(3)
+
 starttime = datetime.datetime.now()
+package_id = 1
+payload = b'x' * PAYLOAD_SIZE
 
 while True:
-    sock.sendto(testdata, client_addr)
+    header = bytes('{:0>8}'.format(format(package_id, 'X')), 'utf-8')      #Faz um header com caracteres com um identificador único para cada pacote, em hexadecimal
+    package_id += 1
+    package = b''.join([header, payload])
+
+    while True:     #Caso o não receba a comfirmação em um determinado tempo, envia o pacote de novo
+        try:
+            sock.sendto(package, client_addr)
+            data, client_addr = sock.recvfrom(PACKAGE_SIZE)
+
+            if(data == b'OK!'):
+                break
+        except socket.timeout:
+            continue
 
     endtime = datetime.datetime.now()
     delta = endtime - starttime
 
     if(delta.seconds >= 20):
-        sock.sendto(b'END!', client_addr)
+        header = bytes('{:0>8}'.format(0), 'utf-8')      #Faz um header com HEADER_SIZE 0's, em hexadecimal
+        package = b''.join([header, b'END!'])
+
+        while True:
+            try:
+                sock.sendto(package, client_addr)
+                data, client_addr = sock.recvfrom(PACKAGE_SIZE)
+
+                if(data == b'OK!'):
+                    break
+            except socket.timeout:
+                continue
         break
 
 endtime = datetime.datetime.now()
 
 ## UPLOAD DO CLIENTE
-print("### Testando Upload do Cliente ###\n")
+""" print("### Testando Upload do Cliente ###\n")
 
 starttime = datetime.datetime.now()
 package_lost = 0
@@ -49,6 +77,7 @@ while True:
     data, client_addr = sock.recvfrom(PACKAGE_SIZE)
     if data != b'END!':
         index = int(str(data)[2:HEADER_SIZE+2], 16)
+        print(index)
         package_controll.append(index)
 
         del data
@@ -68,4 +97,6 @@ for i in package_controll:
 
 sock.sendto(str(package_lost).encode(), client_addr)
 
-sock.close()
+sock.close() """
+
+#189.7.30.181
