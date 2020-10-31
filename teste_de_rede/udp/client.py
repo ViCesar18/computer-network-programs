@@ -11,6 +11,9 @@ ADDR = (HOST, PORT)
 HEADER_SIZE = 8
 PAYLOAD_SIZE = PACKAGE_SIZE - HEADER_SIZE
 
+print(f'\nTamanho do HEADER: {HEADER_SIZE}')
+print(f'Tamanho do PAYLOAD: {PAYLOAD_SIZE}\n')
+
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.settimeout(3)
 
@@ -33,7 +36,7 @@ print_count = 1
 duplicated_packages = 0
 package_list = {}
 
-print('\n### Testando Download ###')
+print('### Testando Download ###')
 while True:
     package, server_socket = sock.recvfrom(PACKAGE_SIZE)
 
