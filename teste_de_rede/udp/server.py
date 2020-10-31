@@ -90,7 +90,6 @@ print("### Testando Upload do Cliente ###\n")
 
 sock.settimeout(None)
 
-starttime = datetime.datetime.now()
 print_count = 1
 package_list = {}
 duplicate_packages = 0
@@ -105,9 +104,6 @@ while True:
         duplicate_packages = duplicate_packages + 1
 
     sock.sendto(b'OK!', client_addr)
-
-    endtime = datetime.datetime.now()
-    delta = endtime - starttime
 
     if package_id != 0:
         continue

@@ -73,8 +73,8 @@ while True:
     print(f'Pacotes Recebidos: {package_counter}')
     print(f'Pacotes Perdidos: {packages_lost}')
     print(f'Bytes Transferidos: {round(bytes_transferred, 2)} MB')
-    print(f'Velocidade Média: {speed} Mbps\n')
-    print(f'Tempo: {delta.seconds} segundos')
+    print(f'Velocidade Média: {speed} Mbps')
+    print(f'Tempo: {delta.seconds} segundos\n')
     break
 
 ## UPLOAD
@@ -151,5 +151,5 @@ print('\n\n## RESULTADO ##')
 print(f'Pacotes Enviados: {package_counter}')
 print(f'Pacotes Perdidos: {packages_lost}')
 print(f'Bytes Transferidos: {round(bytes_transferred, 2)} MB')
-print(f'Velocidade Média: {speed} Mbps\n')
-print(f'Tempo: {delta.seconds} segundos')
+print(f'Velocidade Média: {speed} Mbps')
+print(f'Tempo: {delta.seconds} segundos\n')
