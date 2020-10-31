@@ -5,9 +5,9 @@ import socket
 
 HOST = '0.0.0.0'
 PORT = 8888
-BUFFER = 4096
+PACKAGE_SIZE = 4096
 
-testdata = b'x' * BUFFER * 4
+package = b'x' * PACKAGE_SIZE * 4
 
 print("\n### Testando Download do Cliente ###\n")
 
@@ -23,7 +23,7 @@ print(starttime, end=' ')
 print(f'{client_addr[0]}:{client_addr[1]} conectado')
 
 while True:
-    client_sock.send(testdata)
+    client_sock.send(package)
 
     endtime = datetime.datetime.now()
     delta = endtime - starttime
@@ -49,7 +49,7 @@ print(starttime, end=' ')
 print(f'{client_addr[0]}:{client_addr[1]} conectado')
 
 while True:
-    data = client_sock.recv(BUFFER)
+    data = client_sock.recv(PACKAGE_SIZE)
     if data:
         del data
         continue

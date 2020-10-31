@@ -5,27 +5,24 @@ import socket
 
 HOST = input('Digite o IP que deseja conectar: ')
 PORT = 8888
-BUFFER = 4096
+PACKAGE_SIZE = 4096
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.connect((HOST,PORT))
 
 starttime = datetime.datetime.now()
-""" print(starttime, end=' ')
-print(f'Conectado à {HOST}:{PORT}\n') """
-
-count = 0
+package_count = 0
 print_count = 1
 
 print('\n### Testando Download ###')
 while True:
-    data = sock.recv(BUFFER)
+    data = sock.recv(PACKAGE_SIZE)
+    package_count = package_count + 1
 
     endtime = datetime.datetime.now()
     delta = endtime - starttime
 
     if data:
-        count += len(data)
         del data
 
         if(delta.seconds >= print_count):
@@ -38,15 +35,15 @@ while True:
     sock.close()
 
     endtime = datetime.datetime.now()
-    """ print(endtime, end=' ')
-    print(f'Desconectado de {HOST}:{PORT}\n') """
+    delta = endtime - starttime
+    bytes_transferred = round(package_count * PACKAGE_SIZE / 1024 / 1024, 2)
+    speed = round(bytes_transferred * 8 / delta.seconds, 2)
 
     print('## RESULTADO ##')
-    print(f'Bytes Transferidos: {count / 1024 / 1024} MB')
-    delta = endtime - starttime
-    print(f'Tempo (segundos): {delta.seconds}')
-    speed = (count * 8) / 1024 / 1024 / delta.seconds
-    print(f'Velocidade Média (Mbps): {speed}\n')
+    print(f'Pacotes Recebidos: {package_count}')
+    print(f'Bytes Transferidos: {bytes_transferred} MB')
+    print(f'Velocidade Média: {speed} Mbps')
+    print(f'Tempo: {delta.seconds} segundos\n')
     break
 
 ## UPLOAD
@@ -55,19 +52,15 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.connect((HOST,PORT))
 
 starttime = datetime.datetime.now()
-""" print(starttime, end=' ')
-print(f'Conectado à {HOST}:{PORT}\n') """
 
-count = 0
+package_count = 0
 print_count = 1
+package = b'x' * PACKAGE_SIZE * 4
 
 print('### Testando Upload ###')
-
-testdata = b'x' * BUFFER * 4
-
 while True:
-    sock.send(testdata)
-    count += len(testdata)
+    sock.send(package)
+    package_count = package_count + 1
 
     endtime = datetime.datetime.now()
     delta = endtime - starttime
@@ -83,12 +76,12 @@ print('\n')
 sock.close()
 
 endtime = datetime.datetime.now()
-""" print(endtime, end=' ')
-print(f'Desconectado de {HOST}:{PORT}\n') """
+delta = endtime - starttime
+bytes_transferred = round(package_count * PACKAGE_SIZE / 1024 / 1024, 2)
+speed = round(bytes_transferred * 8 / delta.seconds, 2)
 
 print('## RESULTADO ##')
-print(f'Bytes Transferidos: {count / 1024 / 1024} MB')
-delta = endtime - starttime
-print(f'Tempo (segundos): {delta.seconds}')
-speed = (count * 8) / 1024 / 1024 / delta.seconds
-print(f'Velocidade Média (Mbps): {speed}\n')
+print(f'Pacotes Enviados: {package_count}')
+print(f'Bytes Transferidos: {bytes_transferred} MB')
+print(f'Velocidade Média: {speed} Mbps')
+print(f'Tempo: {delta.seconds} segundos\n')
