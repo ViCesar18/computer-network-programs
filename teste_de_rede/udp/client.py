@@ -92,7 +92,7 @@ print_count = 1
 packages_resent = 0
 payload = b'x' * PAYLOAD_SIZE
 
-print('\n### Testando Download ###')
+print('\n### Testando Upload ###')
 while True:
     header = bytes('{:0>8}'.format(format(package_id, 'X')), 'utf-8')      #Faz um header com caracteres com um identificador único para cada pacote, em hexadecimal
     package_id += 1
