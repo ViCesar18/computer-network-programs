@@ -30,11 +30,8 @@ while True: #Caso o não receba a comfirmação em um determinado tempo, envia o
 sock.settimeout(None)
 
 starttime = datetime.datetime.now()
-package_id = 1
 package_counter = 0
 print_count = 1
-duplicated_packages = 0
-package_list = {}
 
 print('### Testando Download ###')
 while True:
@@ -43,12 +40,13 @@ while True:
     package_counter = package_counter + 1
 
     package_id = int(str(package)[2:HEADER_SIZE+2], 16)
-    if not package_list.get(package_id):
-        package_list[package_id] = package[HEADER_SIZE:]
-    else:
-        duplicated_packages = duplicated_packages + 1
 
-    sock.sendto(b'OK!', ADDR)
+    """ if not package_list.get(package_id):
+        #package_list[package_id] = package[HEADER_SIZE:]
+    else:
+        duplicated_packages = duplicated_packages + 1 """
+
+    #sock.sendto(b'OK!', ADDR)
 
     endtime = datetime.datetime.now()
     delta = endtime - starttime
@@ -60,14 +58,13 @@ while True:
 
         continue
 
-    package_list.clear()
+    sock.sendto(b'OK!', ADDR)
 
     data, server_addr = sock.recvfrom(PACKAGE_SIZE)
     sock.sendto(b'OK!', ADDR)
+    packages_sended = int(data.decode())
 
-    packages_resent = int(data.decode())
-
-    packages_lost = packages_resent - duplicated_packages
+    packages_lost = packages_sended - package_counter
     bytes_transferred = package_counter * PACKAGE_SIZE / 1024 / 1024
     delta = endtime - starttime
     speed = round(bytes_transferred * 8 / delta.seconds, 2)
@@ -86,10 +83,8 @@ sock.settimeout(3)
 
 starttime = datetime.datetime.now()
 package_id = 1
-package_counter = 0
 count_timeout = 0
 print_count = 1
-packages_resent = 0
 payload = b'x' * PAYLOAD_SIZE
 
 print('\n### Testando Upload ###')
@@ -98,8 +93,7 @@ while True:
     package_id += 1
     package = b''.join([header, payload])
 
-    package_counter = package_counter + 1
-    while True:     #Caso o não receba a comfirmação em um determinado tempo, envia o pacote de novo
+    """ while True:     #Caso o não receba a comfirmação em um determinado tempo, envia o pacote de novo
         try:
             sock.sendto(package, ADDR)
             data, server_addr = sock.recvfrom(PACKAGE_SIZE)
@@ -108,7 +102,9 @@ while True:
                 break
         except socket.timeout:
             packages_resent = packages_resent + 1
-            continue
+            continue """
+
+    sock.sendto(package, ADDR)
 
     endtime = datetime.datetime.now()
     delta = endtime - starttime
@@ -136,22 +132,19 @@ while True:
                     continue
         break
 
-sock.settimeout(None)
-
 data, server_addr = sock.recvfrom(PACKAGE_SIZE)
 sock.sendto(b'OK!', ADDR)
-
-duplicated_packages = int(data.decode())
+packages_received = int(data.decode())
 
 sock.close()
 
-packages_lost = packages_resent - duplicated_packages
-bytes_transferred = package_counter * PACKAGE_SIZE / 1024 / 1024
+packages_lost = package_id - packages_received
+bytes_transferred = package_id * PACKAGE_SIZE / 1024 / 1024
 delta = endtime - starttime
 speed = round(bytes_transferred * 8 / delta.seconds, 2)
 
 print('\n\n## RESULTADO ##')
-print(f'Pacotes Enviados: {package_counter}')
+print(f'Pacotes Enviados: {package_id}')
 print(f'Pacotes Perdidos: {packages_lost}')
 print(f'Bytes Transferidos: {round(bytes_transferred, 2)} MB')
 print(f'Velocidade Média: {speed} Mbps')

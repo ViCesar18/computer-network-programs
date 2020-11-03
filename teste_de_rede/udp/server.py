@@ -29,7 +29,6 @@ sock.settimeout(3)
 starttime = datetime.datetime.now()
 package_id = 1
 count_timeout = 0
-packages_resent = 0
 payload = b'x' * PAYLOAD_SIZE
 
 while True:
@@ -37,7 +36,7 @@ while True:
     package_id += 1
     package = b''.join([header, payload])
 
-    while True:     #Caso o não receba a comfirmação em um determinado tempo, envia o pacote de novo
+    """ while True:     #Caso o não receba a comfirmação em um determinado tempo, envia o pacote de novo
         try:
             sock.sendto(package, client_addr)
             data, client_addr = sock.recvfrom(PACKAGE_SIZE)
@@ -46,7 +45,9 @@ while True:
                 break
         except socket.timeout:
             packages_resent = packages_resent + 1
-            continue
+            continue """
+
+    sock.sendto(package, client_addr)
 
     endtime = datetime.datetime.now()
     delta = endtime - starttime
@@ -73,7 +74,7 @@ while True:
 count_timeout = 0
 while True: #Caso o não receba a comfirmação em um determinado tempo, envia o pacote de novo, até um máximo de 5 vezes
     try:
-        sock.sendto(str(packages_resent).encode(), client_addr)
+        sock.sendto(str(package_id).encode(), client_addr)
         data, client_addr = sock.recvfrom(PACKAGE_SIZE)
 
         if data == b'OK!':
@@ -90,25 +91,24 @@ print("### Testando Upload do Cliente ###\n")
 
 sock.settimeout(None)
 
-print_count = 1
-package_list = {}
-duplicate_packages = 0
+package_counter = 0
 
 while True:
     package, server_socket = sock.recvfrom(PACKAGE_SIZE)
+    package_counter = package_counter + 1
 
     package_id = int(str(package)[2:HEADER_SIZE+2], 16)
-    if not package_list.get(package_id):
+    """ if not package_list.get(package_id):
         package_list[package_id] = package[HEADER_SIZE:]
     else:
-        duplicate_packages = duplicate_packages + 1
+        duplicate_packages = duplicate_packages + 1 """
 
-    sock.sendto(b'OK!', client_addr)
+    #sock.sendto(b'OK!', client_addr)
 
     if package_id != 0:
         continue
 
-    package_list.clear()
+    sock.sendto(b'OK!', client_addr)
 
     break
 
@@ -116,7 +116,7 @@ sock.settimeout(3)
 
 while True: #Caso o não receba a comfirmação em um determinado tempo, envia o pacote de novo, até perder a conexão com o cliente
     try:
-        sock.sendto(str(duplicate_packages).encode(), client_addr)
+        sock.sendto(str(package_counter).encode(), client_addr)
         data, client_addr = sock.recvfrom(PACKAGE_SIZE)
 
         if data == b'OK!':
