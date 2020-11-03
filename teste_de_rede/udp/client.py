@@ -1,6 +1,6 @@
 import datetime
 import socket
-import time
+
 ## DOWNLOAD
 
 HOST = input('Digite o IP que deseja conectar: ')
@@ -35,21 +35,14 @@ print_count = 1
 
 print('### Testando Download ###')
 while True:
-    package, server_socket = sock.recvfrom(PACKAGE_SIZE)
-    
     endtime = datetime.datetime.now()
     delta = endtime - starttime
+
+    package, server_socket = sock.recvfrom(PACKAGE_SIZE)
 
     package_counter = package_counter + 1
 
     package_id = int(str(package)[2:HEADER_SIZE+2], 16)
-
-    """ if not package_list.get(package_id):
-        #package_list[package_id] = package[HEADER_SIZE:]
-    else:
-        duplicated_packages = duplicated_packages + 1 """
-
-    #sock.sendto(b'OK!', ADDR)
 
     if package_id != 0:
         if(delta.seconds >= print_count):
@@ -77,6 +70,7 @@ while True:
     print(f'Tempo: {delta.seconds} segundos\n')
     break
 
+
 ## UPLOAD
 
 sock.settimeout(3)
@@ -93,19 +87,7 @@ while True:
     package_id += 1
     package = b''.join([header, payload])
 
-    """ while True:     #Caso o não receba a comfirmação em um determinado tempo, envia o pacote de novo
-        try:
-            sock.sendto(package, ADDR)
-            data, server_addr = sock.recvfrom(PACKAGE_SIZE)
-
-            if(data == b'OK!'):
-                break
-        except socket.timeout:
-            packages_resent = packages_resent + 1
-            continue """
-
     sock.sendto(package, ADDR)
-    #time.sleep(0.01)
 
     endtime = datetime.datetime.now()
     delta = endtime - starttime
@@ -115,7 +97,7 @@ while True:
         print('.', end='', flush=True)
 
     if(delta.seconds >= 20):
-        header = bytes('{:0>8}'.format(0), 'utf-8')      #Faz um header com HEADER_SIZE 0's, em hexadecimal
+        header = bytes('{:0>8}'.format(0), 'utf-8')     #Faz um header com HEADER_SIZE 0's, em hexadecimal
         package = b''.join([header, b'END!'])
 
         while True: #Caso o não receba a comfirmação em um determinado tempo, envia o pacote de novo, até um máximo de 5 vezes
@@ -149,7 +131,6 @@ speed = round(bytes_transferred * 8 / delta.seconds, 2)
 print('\n\n## RESULTADO ##')
 print(f'Pacotes Enviados: {package_id}')
 print(f'Pacotes Perdidos: {packages_lost}')
-print(f'Pacotes Recebidos Pelo Server: {packages_received}')
 print(f'Bytes Transferidos: {round(bytes_transferred, 2)} MB')
 print(f'Velocidade Média: {speed} Mbps')
 print(f'Tempo: {delta.seconds} segundos\n')

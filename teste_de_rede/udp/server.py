@@ -17,7 +17,7 @@ print(f'\nVinculado em {HOST}:{PORT}\n')
 
 data, client_addr = sock.recvfrom(PACKAGE_SIZE)
 if data == b'CONNECT!':
-    sock.sendto(b'CONNECTED', client_addr)
+    sock.sendto(b'CONNECTED!', client_addr)
 else:
     print('Server nao se conectou com o cliente!')
     exit(1)
@@ -36,24 +36,13 @@ while True:
     package_id += 1
     package = b''.join([header, payload])
 
-    """ while True:     #Caso o não receba a comfirmação em um determinado tempo, envia o pacote de novo
-        try:
-            sock.sendto(package, client_addr)
-            data, client_addr = sock.recvfrom(PACKAGE_SIZE)
-
-            if(data == b'OK!'):
-                break
-        except socket.timeout:
-            packages_resent = packages_resent + 1
-            continue """
-
     sock.sendto(package, client_addr)
 
     endtime = datetime.datetime.now()
     delta = endtime - starttime
 
     if(delta.seconds >= 20):
-        header = bytes('{:0>8}'.format(0), 'utf-8')      #Faz um header com HEADER_SIZE 0's, em hexadecimal
+        header = bytes('{:0>8}'.format(0), 'utf-8')     #Faz um header com HEADER_SIZE 0's, em hexadecimal
         package = b''.join([header, b'END!'])
 
         while True: #Caso o não receba a comfirmação em um determinado tempo, envia o pacote de novo, até um máximo de 5 vezes
@@ -98,12 +87,6 @@ while True:
     package_counter = package_counter + 1
 
     package_id = int(str(package)[2:HEADER_SIZE+2], 16)
-    """ if not package_list.get(package_id):
-        package_list[package_id] = package[HEADER_SIZE:]
-    else:
-        duplicate_packages = duplicate_packages + 1 """
-
-    #sock.sendto(b'OK!', client_addr)
 
     if package_id != 0:
         continue
