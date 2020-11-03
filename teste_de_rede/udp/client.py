@@ -1,11 +1,11 @@
 import datetime
 import socket
-
+import time
 ## DOWNLOAD
 
 HOST = input('Digite o IP que deseja conectar: ')
 PORT = 8888
-PACKAGE_SIZE = 4096
+PACKAGE_SIZE = 1024
 ADDR = (HOST, PORT)
 
 HEADER_SIZE = 8
@@ -36,6 +36,9 @@ print_count = 1
 print('### Testando Download ###')
 while True:
     package, server_socket = sock.recvfrom(PACKAGE_SIZE)
+    
+    endtime = datetime.datetime.now()
+    delta = endtime - starttime
 
     package_counter = package_counter + 1
 
@@ -47,9 +50,6 @@ while True:
         duplicated_packages = duplicated_packages + 1 """
 
     #sock.sendto(b'OK!', ADDR)
-
-    endtime = datetime.datetime.now()
-    delta = endtime - starttime
 
     if package_id != 0:
         if(delta.seconds >= print_count):
@@ -69,7 +69,7 @@ while True:
     delta = endtime - starttime
     speed = round(bytes_transferred * 8 / delta.seconds, 2)
 
-    print('\n## RESULTADO ##')
+    print('\n\n## RESULTADO ##')
     print(f'Pacotes Recebidos: {package_counter}')
     print(f'Pacotes Perdidos: {packages_lost}')
     print(f'Bytes Transferidos: {round(bytes_transferred, 2)} MB')
@@ -105,6 +105,7 @@ while True:
             continue """
 
     sock.sendto(package, ADDR)
+    #time.sleep(0.01)
 
     endtime = datetime.datetime.now()
     delta = endtime - starttime
@@ -132,6 +133,8 @@ while True:
                     continue
         break
 
+sock.settimeout(None)
+
 data, server_addr = sock.recvfrom(PACKAGE_SIZE)
 sock.sendto(b'OK!', ADDR)
 packages_received = int(data.decode())
@@ -139,13 +142,14 @@ packages_received = int(data.decode())
 sock.close()
 
 packages_lost = package_id - packages_received
-bytes_transferred = package_id * PACKAGE_SIZE / 1024 / 1024
+bytes_transferred = packages_received * PACKAGE_SIZE / 1024 / 1024
 delta = endtime - starttime
 speed = round(bytes_transferred * 8 / delta.seconds, 2)
 
 print('\n\n## RESULTADO ##')
 print(f'Pacotes Enviados: {package_id}')
 print(f'Pacotes Perdidos: {packages_lost}')
+print(f'Pacotes Recebidos Pelo Server: {packages_received}')
 print(f'Bytes Transferidos: {round(bytes_transferred, 2)} MB')
 print(f'Velocidade Média: {speed} Mbps')
 print(f'Tempo: {delta.seconds} segundos\n')
